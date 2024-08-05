@@ -11,18 +11,19 @@
     - [How does it work?](#How-does-it-work?)
     - [What problem does it solve?](What-problem-does-it-solve?)
 - [Diagram](#diagram)
-    - [Eigenlayer: Restaking](#Eigenlayer:-Restaking)
-    - [AVS: Yield-streaming](#AVS:-Yield-streaming)
-    - [User: Yield-claiming](#User:-Yield-claiming)
-    - [User: Yield-claiming](#User:-Yield-claiming)
+    - [Eigenlayer: Restaking](#Eigenlayer-Restaking)
+    - [AVS: Yield-streaming](#AVS-Yield-streaming)
+    - [User: Yield-claiming](#User-Yield-claiming)
+    - [User: Yield-claiming](#User-Yield-claiming)
 - [Implementation](#development)
-    - [CosmWasm Smart Contracts](#Eigenlayer Contracts)
-    - [AVS Reference Implementationn](#AVS Reference Implementation)
+    - [CosmWasm Smart Contracts](#Eigenlayer-Contracts)
+    - [AVS Reference Implementationn](#AVS-Reference-Implementation)
     - [YIELDI WASM Contracts](#YIELDI-WASM-Contracts)
     - [THORChain Yield Accounts](#THORChain-Yield-Accounts)
 - [Economics](#Economics)
     - [One-time Liquidity Auction](#One-time-Liquidity-Auction)
     - [Liquidity Mining](#Liquidity-Mining)
+    - [BTC LSP Support](#BTC-LSP-Support)
 - [Summary](#Summary)
 - [Technical Readiness](#Technical-Readiness)
 
@@ -56,19 +57,19 @@ Stakers are much more likely to delegate their LSTs to AVS operators who can pay
 
 The following diagrams for each process provide a visual representation of the asset flow. 
 
-## Eigenlayer: Restaking
+## Eigenlayer Restaking
 
 <img width="699" alt="image" src="https://github.com/user-attachments/assets/fd577da5-3862-4b40-8b5e-7f240aaf04fa">
 
-## AVS: Yield-streaming
+## AVS Yield-streaming
 
 <img width="698" alt="image" src="https://github.com/user-attachments/assets/098b95ac-d7cb-40d6-8a8b-561b978ed612">
 
-## YIELDI: Yield-collecting
+## YIELDI Yield-collecting
 
 <img width="697" alt="image" src="https://github.com/user-attachments/assets/76f8348e-5670-437b-9232-43566dee2248">
 
-## User: Yield-claiming
+## User Yield-claiming
 
 <img width="697" alt="image" src="https://github.com/user-attachments/assets/b36be643-dbda-4ef3-9e77-50d55a111c49">
 
@@ -241,6 +242,26 @@ The AVS should continually stream yield incentives to the `TOR:AVS` pool as it w
 1) The AVS can stream token incentives through the IBC channel with destination the `TOR:AVS` pool.
 2) The incentives are added into the pool which are credited to the pool LPs.
 
+## BTC LSP Support
+
+Yield collection for BTC LSPs are also possible. 
+1) BTC locked in a script are parsed by the BTC LSP
+2) This can be delegated to a AVS which would be IBC compatible
+3) The AVS streams yield through IBC to YIELDI pools on THORChain where it is swapped to BTC
+4) The BTC is held in a yield account until it is ready to be streamed or claimed by the BTC user
+
+## Trust Assumptions
+
+Users stake their LST with the LSP, which is secured by the base-layer protocol (ETH, BTC). When delegated to an AVS, the LSP monitors for double-signing behaviour and slashes. Yieldi does not hold or care about the staked balance, or slashing concerns. 
+
+Only the streaming yield is routed via THORChain and deposited into a Yield Account temporarily. This Yield Account is secured by THORChain's economic guarantees and it's Incentive Pendulum. 
+The user can claim or request their yield is streamed to them, reducing the period of time they have to trust the protocol with. 
+
+Yieldi can also be deployed on any cross-chain liquidity protocol which has the following technical requirements:
+1) Is IBC compatible
+2) Has token-pools
+3) Has ETH and BTC layer 1 liquidity available
+
 # Summary
 
 YIELDI - a yield-collecting service for the Eigenlayer Ecosystem is outlined. The following are the discrete components:
@@ -250,7 +271,6 @@ YIELDI - a yield-collecting service for the Eigenlayer Ecosystem is outlined. Th
 3) AVS: Conduct a Liquidity Auction with incentives to correctly price and build liquidity for the yield token
 4) YIELDI: Deploy AVS pools and process inbound yield swaps to native ETH
 5) THORChain: Support Yield Accounts and allow users to query balances, claim and set auto-stream
-
 
 # Technical Readiness
 
