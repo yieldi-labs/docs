@@ -1,18 +1,17 @@
 # Technical Architecture
-📜 Technical Architecture of Hodly
+📜 Technical Architecture of YIELDI
 
-<img width="918" alt="image" src="https://github.com/user-attachments/assets/634d7f15-c7dd-4617-8558-b510d64f756c">
-
+<img width="701" alt="image" src="https://github.com/user-attachments/assets/7ad05a3c-67ca-4b77-b743-9d30b235ac67">
 
 # Overview
 
-This document serves as a comprehensive guide to understanding the underlying design and structure of Hodly, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
+This document serves as a comprehensive guide to understanding the underlying design and structure of YIELDI, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
 
-## What is Hodly?
+## What is YIELDI?
 
-Hodly offers a gas-efficient yield-collecting solution for the [Eigenlayer](https://eigenlayer.xyz/) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH liquidity. Users can re-stake ETH with Eigenlayer and delegate their security to an app-chain (Active Validator Set or AVS). The AVS can stream yield back to the staker as native ETH using Hodly, where stakers can view their accumulated yield, claim it, or even have it auto-streamed to their address on a gas-efficient interval. 
+YIELDI offers a gas-efficient yield-collecting solution for the [Eigenlayer](https://eigenlayer.xyz/) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH liquidity. Users can re-stake ETH with Eigenlayer and delegate their security to an app-chain (Active Validator Set or AVS). The AVS can stream yield back to the staker as native ETH using YIELDI, where stakers can view their accumulated yield, claim it, or even have it auto-streamed to their address on a gas-efficient interval. 
 
-Hodly also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
+YIELDI also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
 
 ## How does it work?
 
@@ -20,7 +19,7 @@ Stakers deposit into Eigenlayer's contracts. The AVS can read and compute the us
 
 ## What problem does it solve?
 
-ETH stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH instead of an illiquid rewards token that does not yet have liquidity or price discovery. Hodly solves the routing and collection of yield tokens, as well as ensuring they have liquidity against ETH. ETH stakers will simply see their rewards accrued in a native ETH balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
+ETH stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH instead of an illiquid rewards token that does not yet have liquidity or price discovery. YIELDI solves the routing and collection of yield tokens, as well as ensuring they have liquidity against ETH. ETH stakers will simply see their rewards accrued in a native ETH balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
 
 ## Terms:
 
@@ -37,7 +36,8 @@ The following diagrams for each process provide a visual representation of the a
 
 Diagram of Eigenlyer Restaking Flow
 
-<img width="760" alt="image" src="https://github.com/user-attachments/assets/af839f2c-866f-4324-a810-c20315589acb">
+<img width="698" alt="image" src="https://github.com/user-attachments/assets/5f325d1f-2e7f-4150-9119-cf5f7821fa8c">
+
 
 
 ## AVS: Yield-streaming
@@ -47,9 +47,9 @@ Diagram of AVS Yield Streaming
 <img width="758" alt="image" src="https://github.com/user-attachments/assets/23e89e42-2652-40c7-8b05-b979309bbdcf">
 
 
-## Hodly: Yield-collecting
+## YIELDI: Yield-collecting
 
-Diagram of Hodly Yield Collection
+Diagram of YIELDI Yield Collection
 
 <img width="698" alt="image" src="https://github.com/user-attachments/assets/c5feef01-28d0-4490-b43f-360194d0e308">
 
@@ -142,10 +142,10 @@ The AVS can run an EVM<>IBC Relayer to skip Axelar and directly interact with TH
 
 The AVS gateway contract would hold the yield tokens forever, and the IBC Channel would mint them to forward to THORChain. 
 
-## Hodly WASM Contracts
+## YIELDI WASM Contracts
 
 ### IBC Swap to TOR
-Hodly receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to THORChain's TOR stablecoin. 
+YIELDI receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to THORChain's TOR stablecoin. 
 
 ```rs
 ExecuteMsg
@@ -202,14 +202,14 @@ At this point, it will auto-send the full balance to the user, at which it will 
 
 AVS need two further things to ensure their asset is correctly priced. 
 
-1) Initial liquidity in the `TOR:AVS` token pool in Hodly
+1) Initial liquidity in the `TOR:AVS` token pool in YIELDI
 2) Ongoing liquidity incentives to ensure sufficient liquidity for users
 
 ## One-time Liquidity Auction
 
 A liquidity auction can be conducted by the AVS when setting up the channel. 
 
-1) Mint 5-10% of the supply into Hodly as a CW-20 token
+1) Mint 5-10% of the supply into YIELDI as a CW-20 token
 2) Offer this in the new `TOR:AVS` token pool
 3) Over 7-30 days, anyone can deposit `TOR` to match the `AVS` token and infer the launch price of the asset.
 4) When the pool goes live, the AVS will own 50% of the pool, and Liquidity Auction participants will own the other 50%. 
@@ -223,12 +223,12 @@ The AVS should continually stream yield incentives to the `TOR:AVS` pool as it w
 
 # Summary
 
-Hodly - a yield-collecting service for the Eigenlayer Ecosystem is outlined. The following are the discrete components:
+YIELDI - a yield-collecting service for the Eigenlayer Ecosystem is outlined. The following are the discrete components:
 
 1) AVS: Support yield streaming via an Axelar-like General Message Parsing Gateway Contract
 2) AVS: Maintain an IBC channel to THORChain
 3) AVS: Conduct a Liquidity Auction with incentives to correctly price and build liquidity for the yield token
-4) Hodly: Deploy AVS pools and process inbound yield swaps to native ETH
+4) YIELDI: Deploy AVS pools and process inbound yield swaps to native ETH
 5) THORChain: Support Yield Accounts and allow users to query balances, claim and set auto-stream
 
 
