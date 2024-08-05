@@ -1,11 +1,19 @@
 # Technical Architecture
 📜 Technical Architecture of YIELDI
 
-<img width="701" alt="image" src="https://github.com/user-attachments/assets/7ad05a3c-67ca-4b77-b743-9d30b235ac67">
+<img width="698" alt="image" src="https://github.com/user-attachments/assets/c331ddbe-ce54-4ca7-b8de-20e960abdd5f">
+
 
 # Overview
 
 This document serves as a comprehensive guide to understanding the underlying design and structure of YIELDI, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
+
+## Terms:
+
+- `AVS` Active Validator Set for the app-chain
+- `IBC` Inter-Blockchain Communication protocol
+- `LST` Liquid Staking Token
+- `LSP` Liquid Staking Protocol
 
 ## What is YIELDI?
 
@@ -19,14 +27,7 @@ Stakers deposit into Eigenlayer's contracts. The AVS can read and compute the us
 
 ## What problem does it solve?
 
-ETH stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH instead of an illiquid rewards token that does not yet have liquidity or price discovery. YIELDI solves the routing and collection of yield tokens, as well as ensuring they have liquidity against ETH. ETH stakers will simply see their rewards accrued in a native ETH balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
-
-## Terms:
-
-- `AVS` Active Validator Set for the app-chain
-- `IBC` Inter-Blockchain Communication protocol
-- `LST` Liquid Staking Token
-- `LSP` Liquid Staking Protocol
+Stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH instead of an illiquid rewards token that does not yet have liquidity or price discovery. YIELDI solves the routing and collection of yield tokens, as well as ensuring they have liquidity against ETH. ETH stakers will simply see their rewards accrued in a native ETH balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
 
 # Diagrams
 
@@ -34,40 +35,25 @@ The following diagrams for each process provide a visual representation of the a
 
 ## Eigenlayer: Restaking
 
-Diagram of Eigenlyer Restaking Flow
-
-<img width="698" alt="image" src="https://github.com/user-attachments/assets/5f325d1f-2e7f-4150-9119-cf5f7821fa8c">
-
-
+<img width="699" alt="image" src="https://github.com/user-attachments/assets/fd577da5-3862-4b40-8b5e-7f240aaf04fa">
 
 ## AVS: Yield-streaming
 
-Diagram of AVS Yield Streaming
-
-<img width="758" alt="image" src="https://github.com/user-attachments/assets/23e89e42-2652-40c7-8b05-b979309bbdcf">
-
+<img width="698" alt="image" src="https://github.com/user-attachments/assets/098b95ac-d7cb-40d6-8a8b-561b978ed612">
 
 ## YIELDI: Yield-collecting
 
-Diagram of YIELDI Yield Collection
-
-<img width="698" alt="image" src="https://github.com/user-attachments/assets/c5feef01-28d0-4490-b43f-360194d0e308">
-
-
+<img width="697" alt="image" src="https://github.com/user-attachments/assets/76f8348e-5670-437b-9232-43566dee2248">
 
 ## User: Yield-claiming
 
-Diagram of User Yield Claiming
-
-<img width="754" alt="image" src="https://github.com/user-attachments/assets/01d09e39-50d6-4471-b682-3450cef3f969">
-
-
+<img width="697" alt="image" src="https://github.com/user-attachments/assets/b36be643-dbda-4ef3-9e77-50d55a111c49">
 
 # Implementation
 
 ## Eigenlayer Contracts
 
-When the user deposits their ETH and delegates it to an AVS operator in a token pool, their address and amount is stored in the [Eigenlayer contract](https://www.blog.eigenlayer.xyz/ycie/): 
+When the user deposits their LST and delegates it to an AVS operator in a token pool, their address and amount is stored in the [Eigenlayer contract](https://www.blog.eigenlayer.xyz/ycie/): 
 
 ```js
 contract TokenManager {
@@ -107,11 +93,11 @@ contract YieldManager {
 }
 ```
 
-## Axelar EVM to IBC General Message Parsing
+## EVM to IBC General Message Parsing
 
-The AVS must have a deployed [Axelar Gateway contract](https://docs.axelar.dev/dev/cosmos-gmp) or similiar. 
+The AVS must have a deployed [gateway contract](https://docs.axelar.dev/dev/cosmos-gmp) which can lock tokens and emit an IBC-compatible message. 
 
-The AVS calls the Gateway contract with the yield tokens, which then forwards it via Axelar to THORChain. 
+The IBC relayer mints IBC-tokens and then forwards to THORChain via an IBC channel. 
 
 Only the Staker's L1 address and the yield amount is sent (in yield tokens). 
 
@@ -136,16 +122,14 @@ function callContractWithToken(
 ) external;
 ```
 
-### Optional: AVS Runs the Relayer. 
+### IBC chains. 
 
-The AVS can run an EVM<>IBC Relayer to skip Axelar and directly interact with THORChain for simplicity. 
-
-The AVS gateway contract would hold the yield tokens forever, and the IBC Channel would mint them to forward to THORChain. 
+AVS which are natively IBC compatible simply need to emite the IBC packet and skip the EVM Gateway contract.
 
 ## YIELDI WASM Contracts
 
 ### IBC Swap to TOR
-YIELDI receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to THORChain's TOR stablecoin. 
+YIELDI receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to native ETH. 
 
 ```rs
 ExecuteMsg
@@ -159,8 +143,8 @@ Swap {
     }
 ```
 
-### L1 swap to ETH Yield Account
-The callback would then redeem the TOR into L1 RUNE, then stream to ETH to the user's ETH Yield Account: 
+### Deposit to ETH Yield Account
+The callback would then stream to ETH to the user's ETH Yield Account: 
 
 ```md
 MsgDeposit{
@@ -189,14 +173,20 @@ function depositWithExpiry(address payable vault, address asset, uint amount, st
 
 MEMO: CLAIM // Claim all the yield
 MEMO: CLAIM:5000 // Claim 50% of the yield
-MEMO: CLAIM:10000:100 // Claim all the yield and set auto-stream to 100x the gas cost
-MEMO: CLAIM::0 // Claim all the yield and set auto-stream off
 ```
 
 ### Auto-stream
 
-THORChain has a [Collector Module](https://gitlab.com/thorchain/thornode/-/merge_requests/2978) that holds assets until they reach a value that is 100x the outboundGasCost for that chain.
-At this point, it will auto-send the full balance to the user, at which it will execute at a minimum of 99% (1% would be the max gas cost). This efficiently sends native yield directly back to the user. 
+THORChain has a [Collector Module](https://gitlab.com/thorchain/thornode/-/merge_requests/2978) that holds assets until they reach a value that is 100x the `outboundGasCost` for that chain.
+On a regular interval, it will auto-send the full balance to the user, at which it will execute at a minimum of 99% (1% would be the max gas cost). This efficiently sends native yield directly back to the user. 
+
+The user has an option to specify their stream interval when interacting with THORChain:
+
+```
+MEMO: CLAIM::100 // Claim all the yield and set auto-stream to 100x the gas cost (99% execution)
+MEMO: CLAIM::1000 // Claim all the yield and set auto-stream 1000x the gas cost (99.9% execution)
+MEMO: CLAIM::0 // Claim all the yield and set auto-stream off
+```
 
 # Economics
 
@@ -205,7 +195,12 @@ AVS need two further things to ensure their asset is correctly priced.
 1) Initial liquidity in the `TOR:AVS` token pool in YIELDI
 2) Ongoing liquidity incentives to ensure sufficient liquidity for users
 
+Without adequate liquidity and an existing price, the user is not able to correctly determine the risk-reward for delegating to a particular operator. 
+Over time, the operators with the most liquidity, stable price and economic activity on their chains would pay their highest risk-reward returns for their users. 
+
 ## One-time Liquidity Auction
+
+> AVS operators need a liquidity venue for their assets with an established price
 
 A liquidity auction can be conducted by the AVS when setting up the channel. 
 
@@ -215,6 +210,8 @@ A liquidity auction can be conducted by the AVS when setting up the channel.
 4) When the pool goes live, the AVS will own 50% of the pool, and Liquidity Auction participants will own the other 50%. 
 
 ## Liquidity Mining
+
+> AVS should incentivise sufficient liquidity to stablise price and ensure best execution
 
 The AVS should continually stream yield incentives to the `TOR:AVS` pool as it will be the primary liquidity venue for the AVS token. 
 
@@ -232,6 +229,7 @@ YIELDI - a yield-collecting service for the Eigenlayer Ecosystem is outlined. Th
 5) THORChain: Support Yield Accounts and allow users to query balances, claim and set auto-stream
 
 
+# Technical Readiness
 
 
 
