@@ -231,6 +231,15 @@ YIELDI - a yield-collecting service for the Eigenlayer Ecosystem is outlined. Th
 
 # Technical Readiness
 
+1) Users can deposit LST into Eigenlayer ✅
+2) Users can delegate LST to AVS Operator ✅
+3) AVS can compute Users share of the yield via `gRPC` ✅
+4) AVS can deploy gateway contract to emit IBC-compatible event ✅
+5) AVS can send IBC tokens to THORChain ⏳
+6) Yieldi can swap IBC tokens to ETH on THORChain ⏳
+7) Yieldi can deposit ETH into Yield Account ✅
+8) Users can claim accrued ETH in a Yield Account ✅
+9) THORChain can auto-stream yield ✅
 
 
 
