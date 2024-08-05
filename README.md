@@ -3,10 +3,33 @@
 
 <img width="698" alt="image" src="https://github.com/user-attachments/assets/c331ddbe-ce54-4ca7-b8de-20e960abdd5f">
 
+# Table of Contents
+
+- [Overview](#overview)
+    - [Terms](#Terms)
+    - [What is YIELDI?](#what-is-YIELDI?)
+    - [How does it work?](#How-does-it-work?)
+    - [What problem does it solve?](What-problem-does-it-solve?)
+- [Diagram](#diagram)
+    - [Eigenlayer: Restaking](#Eigenlayer:-Restaking)
+    - [AVS: Yield-streaming](#AVS:-Yield-streaming)
+    - [User: Yield-claiming](#User:-Yield-claiming)
+    - [User: Yield-claiming](#User:-Yield-claiming)
+- [Implementation](#development)
+    - [CosmWasm Smart Contracts](#Eigenlayer Contracts)
+    - [AVS Reference Implementationn](#AVS Reference Implementation)
+    - [YIELDI WASM Contracts](#YIELDI-WASM-Contracts)
+    - [THORChain Yield Accounts](#THORChain-Yield-Accounts)
+- [Economics](#Economics)
+    - [One-time Liquidity Auction](#One-time-Liquidity-Auction)
+    - [Liquidity Mining](#Liquidity-Mining)
+- [Summary](#Summary)
+- [Technical Readiness](#Technical-Readiness)
+
 
 # Overview
 
-This document serves as a comprehensive guide to understanding the underlying design and structure of YIELDI, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
+This document is a guide to understanding the design of YIELDI, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
 
 ## Terms:
 
@@ -29,7 +52,7 @@ Stakers deposit into Eigenlayer's contracts. The AVS can read and compute the us
 
 Stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH instead of an illiquid rewards token that does not yet have liquidity or price discovery. YIELDI solves the routing and collection of yield tokens, as well as ensuring they have liquidity against ETH. ETH stakers will simply see their rewards accrued in a native ETH balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
 
-# Diagrams
+# Diagram
 
 The following diagrams for each process provide a visual representation of the asset flow. 
 
@@ -93,7 +116,7 @@ contract YieldManager {
 }
 ```
 
-## EVM to IBC General Message Parsing
+### EVM to IBC
 
 The AVS must have a deployed [gateway contract](https://docs.axelar.dev/dev/cosmos-gmp) which can lock tokens and emit an IBC-compatible message. 
 
@@ -122,7 +145,7 @@ function callContractWithToken(
 ) external;
 ```
 
-### IBC chains. 
+### IBC Chains 
 
 AVS which are natively IBC compatible simply need to emite the IBC packet and skip the EVM Gateway contract.
 
