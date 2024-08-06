@@ -1,13 +1,14 @@
 # Technical Architecture
-📜 Technical Architecture of YIELDI
+📜 Technical Architecture of Yieldi
 
-<img width="698" alt="image" src="https://github.com/user-attachments/assets/c331ddbe-ce54-4ca7-b8de-20e960abdd5f">
+<img width="937" alt="image" src="https://github.com/user-attachments/assets/54eb9b43-5e16-491c-bf64-bbc1cbdb3b78">
+
 
 # Table of Contents
 
 - [Overview](#overview)
     - [Terms](#Terms)
-    - [What is YIELDI?](#what-is-YIELDI?)
+    - [What is Yieldi?](#what-is-Yieldi?)
     - [How does it work?](#How-does-it-work?)
     - [What problem does it solve?](What-problem-does-it-solve?)
 - [Diagram](#diagram)
@@ -18,7 +19,7 @@
 - [Implementation](#development)
     - [CosmWasm Smart Contracts](#Eigenlayer-Contracts)
     - [AVS Reference Implementationn](#AVS-Reference-Implementation)
-    - [YIELDI WASM Contracts](#YIELDI-WASM-Contracts)
+    - [Yieldi WASM Contracts](#Yieldi-WASM-Contracts)
     - [THORChain Yield Accounts](#THORChain-Yield-Accounts)
 - [Economics](#Economics)
     - [One-time Liquidity Auction](#One-time-Liquidity-Auction)
@@ -30,28 +31,30 @@
 
 # Overview
 
-This document is a guide to understanding the design of YIELDI, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
+This document is a guide to understanding the design of Yieldi, with a clear and detailed description of the various components, systems, and technologies that make up the solution.
 
 ## Terms:
 
-- `AVS` Active Validator Set for the app-chain
+- `AVS` Active Validator Set for an app-chain
 - `IBC` Inter-Blockchain Communication protocol
 - `LST` Liquid Staking Token
 - `LSP` Liquid Staking Protocol
 
-## What is YIELDI?
+## What is Yieldi?
 
-YIELDI offers a gas-efficient yield-collecting solution for the [Eigenlayer](https://eigenlayer.xyz/) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH liquidity. Users can re-stake ETH with Eigenlayer and delegate their security to an app-chain (Active Validator Set or AVS). The AVS can stream yield back to the staker as native ETH using YIELDI, where stakers can view their accumulated yield, claim it, or even have it auto-streamed to their address on a gas-efficient interval. 
+Yieldi offers a gas-efficient yield-streaming solution for the [Eigenlayer](https://eigenlayer.xyz/) and [Babylon](https://babylonlabs.io)) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH liquidity. Users can re-stake ETH with Eigenlayer and delegate their security to an AVS. The AVS can stream yield back to the staker as native ETH/BTC using Yieldi, where stakers can view their accumulated yield, claim it, or even have it auto-streamed to their address on a gas-efficient interval. 
 
-YIELDI also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
+Yieldi also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
 
 ## How does it work?
 
-Stakers deposit into Eigenlayer's contracts. The AVS can read and compute the user's share of the yield in points, tokens or fees, then send it via IBC to THORChain on some interval. THORChain is able to swap to native ETH and hold in yield collector module with the owner set to the staker's L1 address. The Staker can then view their yield and claim it any time. Additionally, the Staker may opt-in for auto-streaming, which causes THORChain to stream out the entire balance on a gas-efficient interval. 
+Stakers deposit into Eigenlayer's contracts or lost to Babylon's scripts. The AVS can read and compute the user's share of the yield in points, tokens or fees, then send it via IBC to THORChain on some interval. THORChain is able to swap to native ETH/BTC and hold in yield collector module with the owner set to the staker's L1 address. The Staker can then view their yield and claim it any time. Additionally, the Staker may opt-in for auto-streaming, which causes THORChain to stream out the entire balance on a gas-efficient interval. 
 
 ## What problem does it solve?
 
-Stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH instead of an illiquid rewards token that does not yet have liquidity or price discovery. YIELDI solves the routing and collection of yield tokens, as well as ensuring they have liquidity against ETH. ETH stakers will simply see their rewards accrued in a native ETH balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
+Stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH/BTC instead of an illiquid rewards token that does not yet have liquidity or price discovery. Stakers will simply see their rewards accrued in a native balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
+
+Because the yield is lower risk, and in an asset delivered to the user, removing friction, the cost of yield will be much lower. Thus AVS's will naturally prefer yield-streaming because it will cost them less inflation and they can transition to fees faster. 
 
 # Diagram
 
@@ -65,7 +68,7 @@ The following diagrams for each process provide a visual representation of the a
 
 <img width="698" alt="image" src="https://github.com/user-attachments/assets/098b95ac-d7cb-40d6-8a8b-561b978ed612">
 
-## YIELDI Yield-collecting
+## Yieldi Yield-collecting
 
 <img width="697" alt="image" src="https://github.com/user-attachments/assets/76f8348e-5670-437b-9232-43566dee2248">
 
@@ -101,6 +104,8 @@ contract DelegationManager {
 }
 ```
 
+Babylon users will lock to a BIP322 script parsed by Babylon Chain. 
+
 ## AVS Reference Implementation
 
 The AVS deposits the yield as an ERC-20 token. The AVS is then able to compute the share of the yields to pay to each user and send it.  
@@ -120,7 +125,6 @@ contract YieldManager {
 ### EVM to IBC
 
 The AVS must have a deployed [gateway contract](https://docs.axelar.dev/dev/cosmos-gmp) which can lock tokens and emit an IBC-compatible message. 
-
 The IBC relayer mints IBC-tokens and then forwards to THORChain via an IBC channel. 
 
 Only the Staker's L1 address and the yield amount is sent (in yield tokens). 
@@ -148,12 +152,12 @@ function callContractWithToken(
 
 ### IBC Chains 
 
-AVS which are natively IBC compatible simply need to emite the IBC packet and skip the EVM Gateway contract.
+AVS which are natively IBC compatible simply need to emite the IBC packet and skip the EVM Gateway contract. They set the destination IBC channel as THORChain's and pass the final user L1 address. 
 
-## YIELDI WASM Contracts
+## Yieldi WASM Contracts
 
 ### IBC Swap to TOR
-YIELDI receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to native ETH. 
+Yieldi receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to native ETH/BTC. 
 
 ```rs
 ExecuteMsg
@@ -168,11 +172,11 @@ Swap {
 ```
 
 ### Deposit to ETH Yield Account
-The callback would then stream to ETH to the user's ETH Yield Account: 
+The callback would then stream to ETH/B TC to the user's ETH Yield Account: 
 
 ```md
 MsgDeposit{
-       yield:eth~eth:ethAddress
+       yield+:eth~eth:ethAddress
 }
 ```
 
@@ -191,7 +195,7 @@ last_withdraw_height: 17111060
 }
 ```
 
-The user can Claim their yield at anytime by interating with [THORChain's Router](https://gitlab.com/thorchain/thornode/-/blob/develop/chain/ethereum/contracts/THORChain_Router.sol)
+The user can `CLAIM` their yield at anytime by interating with [THORChain's Router](https://gitlab.com/thorchain/thornode/-/blob/develop/chain/ethereum/contracts/THORChain_Router.sol)
 ```md
 function depositWithExpiry(address payable vault, address asset, uint amount, string memory memo, uint expiration) public
 
@@ -201,11 +205,9 @@ MEMO: CLAIM:5000 // Claim 50% of the yield
 
 ### Auto-stream
 
-THORChain has a [Collector Module](https://gitlab.com/thorchain/thornode/-/merge_requests/2978) that holds assets until they reach a value that is 100x the `outboundGasCost` for that chain.
-On a regular interval, it will auto-send the full balance to the user, at which it will execute at a minimum of 99% (1% would be the max gas cost). This efficiently sends native yield directly back to the user. 
+THORChain has a [Collector Module](https://gitlab.com/thorchain/thornode/-/merge_requests/2978) that holds assets until they reach a value that is 100x the `outboundGasCost` for that chain. On a regular interval, it will auto-send the full balance to the user. This efficiently sends native yield directly back to the user. 
 
 The user has an option to specify their stream interval when interacting with THORChain:
-
 ```
 MEMO: CLAIM::100 // Claim all the yield and set auto-stream to 100x the gas cost (99% execution)
 MEMO: CLAIM::1000 // Claim all the yield and set auto-stream 1000x the gas cost (99.9% execution)
@@ -214,13 +216,24 @@ MEMO: CLAIM::0 // Claim all the yield and set auto-stream off
 
 # Economics
 
-AVS need two further things to ensure their asset is correctly priced. 
+## Problems
 
-1) Initial liquidity in the `TOR:AVS` token pool in YIELDI
+AVS's have two other problems that Yieldi solves:
+1) Price discovery of the AVS token
+2) On-chain liquidity of the AVS token
+
+<img width="962" alt="image" src="https://github.com/user-attachments/assets/be1fa436-6bab-4ae4-bed5-d9097fa13492">
+
+Without an on-chain price of the AVS token, the user struggles to understand the cost of capital and risk in delegating their LRT/LST.
+
+For the AVS, illiquidity on launch will create price volatility and may struggle to transition to the fee regime effectively. If the AVS cannot transition to the fee regime they may suffer in security.  
+
+Thus AVS require the following features provided by Yieldi:
+
+1) Initial liquidity in the `TOR:AVS` token pool in Yieldi
 2) Ongoing liquidity incentives to ensure sufficient liquidity for users
 
-Without adequate liquidity and an existing price, the user is not able to correctly determine the risk-reward for delegating to a particular operator. 
-Over time, the operators with the most liquidity, stable price and economic activity on their chains would pay their highest risk-reward returns for their users. 
+Over time, the operators with the most liquidity, stable price and economic activity on their chains can attract the highest quality delegated security.  
 
 ## One-time Liquidity Auction
 
@@ -228,7 +241,7 @@ Over time, the operators with the most liquidity, stable price and economic acti
 
 A liquidity auction can be conducted by the AVS when setting up the channel. 
 
-1) Mint 5-10% of the supply into YIELDI as a CW-20 token
+1) Mint 5-10% of the supply into Yieldi as a CW-20 token
 2) Offer this in the new `TOR:AVS` token pool
 3) Over 7-30 days, anyone can deposit `TOR` to match the `AVS` token and infer the launch price of the asset.
 4) When the pool goes live, the AVS will own 50% of the pool, and Liquidity Auction participants will own the other 50%. 
@@ -247,7 +260,7 @@ The AVS should continually stream yield incentives to the `TOR:AVS` pool as it w
 Yield collection for BTC LSPs are also possible. 
 1) BTC locked in a script are parsed by the BTC LSP
 2) This can be delegated to a AVS which would be IBC compatible
-3) The AVS streams yield through IBC to YIELDI pools on THORChain where it is swapped to BTC
+3) The AVS streams yield through IBC to Yieldi pools on THORChain where it is swapped to BTC
 4) The BTC is held in a yield account until it is ready to be streamed or claimed by the BTC user
 
 ## Trust Assumptions
@@ -264,12 +277,12 @@ Yieldi can also be deployed on any cross-chain liquidity protocol which has the 
 
 # Summary
 
-YIELDI - a yield-collecting service for the Eigenlayer Ecosystem is outlined. The following are the discrete components:
+Yieldi - a yield-collecting service for the Eigenlayer Ecosystem is outlined. The following are the discrete components:
 
 1) AVS: Support yield streaming via an Axelar-like General Message Parsing Gateway Contract
 2) AVS: Maintain an IBC channel to THORChain
 3) AVS: Conduct a Liquidity Auction with incentives to correctly price and build liquidity for the yield token
-4) YIELDI: Deploy AVS pools and process inbound yield swaps to native ETH
+4) Yieldi: Deploy AVS pools and process inbound yield swaps to native ETH
 5) THORChain: Support Yield Accounts and allow users to query balances, claim and set auto-stream
 
 # Technical Readiness
