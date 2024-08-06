@@ -17,7 +17,7 @@
     - [User: Yield-claiming](#User-Yield-claiming)
     - [User: Yield-claiming](#User-Yield-claiming)
 - [Implementation](#development)
-    - [CosmWasm Smart Contracts](#Eigenlayer-Contracts)
+    - [LSP Staking](#LSP-Staking)
     - [AVS Reference Implementationn](#AVS-Reference-Implementation)
     - [Yieldi WASM Contracts](#Yieldi-WASM-Contracts)
     - [THORChain Yield Accounts](#THORChain-Yield-Accounts)
@@ -42,19 +42,19 @@ This document is a guide to understanding the design of Yieldi, with a clear and
 
 ## What is Yieldi?
 
-Yieldi offers a gas-efficient yield-streaming solution for the [Eigenlayer](https://eigenlayer.xyz/) and [Babylon](https://babylonlabs.io)) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH liquidity. Users can re-stake ETH with Eigenlayer and delegate their security to an AVS. The AVS can stream yield back to the staker as native ETH/BTC using Yieldi, where stakers can view their accumulated yield, claim it, or even have it auto-streamed to their address on a gas-efficient interval. 
+Yieldi offers a gas-efficient yield-streaming solution for the [Eigenlayer](https://eigenlayer.xyz/) and [Babylon](https://babylonlabs.io)) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH/BTC liquidity. Users can re-stake ETH with Eigenlayer, stake BTC with Babylon and delegate their security to an AVS. The AVS can then stream yield back to the staker natively using Yieldi. 
 
-Yieldi also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
+Yieldi also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). It provides the lowest cost of security, because it offers the highest stability and least friction to the staker. Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
 
 ## How does it work?
 
-Stakers deposit into Eigenlayer's contracts or lost to Babylon's scripts. The AVS can read and compute the user's share of the yield in points, tokens or fees, then send it via IBC to THORChain on some interval. THORChain is able to swap to native ETH/BTC and hold in yield collector module with the owner set to the staker's L1 address. The Staker can then view their yield and claim it any time. Additionally, the Staker may opt-in for auto-streaming, which causes THORChain to stream out the entire balance on a gas-efficient interval. 
+Stakers deposit into the LSP with native Assets (ETH/BTC). The AVS can read and compute the user's share of the yield, then send it via IBC to THORChain on some interval. THORChain is able to swap to native assets and hold in yield collector module with the owner set to the staker's L1 address. The Staker can then view their yield and claim it any time. Additionally, the Staker may opt-in for auto-streaming, which causes THORChain to stream out the entire balance on a gas-efficient interval. 
 
 ## What problem does it solve?
 
-Stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH/BTC instead of an illiquid rewards token that does not yet have liquidity or price discovery. Stakers will simply see their rewards accrued in a native balance which they can claim anytime. They will be able to compute their annualised yields and make informed decisions about their capital. 
+Stakers are much more likely to delegate their LSTs to AVS operators who can pay "real yield" which is realised in native ETH/BTC instead of an illiquid rewards token. Stakers will see their rewards accrued in a native balance which they can claim at any time. They will be able to compute their annualised yields and make informed decisions about their capital. 
 
-Because the yield is lower risk, and in an asset delivered to the user, removing friction, the cost of yield will be much lower. Thus AVS's will naturally prefer yield-streaming because it will cost them less inflation and they can transition to fees faster. 
+Because the yield is lower risk, and in an asset delivered to the user, removing friction, the cost of yield will be much lower. Thus AVS's will naturally prefer yield-streaming because it will require less inflation and they can transition to the fee regime faster, avoiding security gaps. 
 
 # Diagram
 
@@ -78,7 +78,7 @@ The following diagrams for each process provide a visual representation of the a
 
 # Implementation
 
-## Eigenlayer Contracts
+## LSP Staking
 
 When the user deposits their LST and delegates it to an AVS operator in a token pool, their address and amount is stored in the [Eigenlayer contract](https://www.blog.eigenlayer.xyz/ycie/): 
 
@@ -104,11 +104,25 @@ contract DelegationManager {
 }
 ```
 
-Babylon users will lock to a BIP322 script parsed by Babylon Chain. 
+Babylon users will lock to a [BIP322 script](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki) parsed by [Babylon Chain](https://github.com/babylonchain/simple-staking). 
+
+```
+ signMessageBIP322 = async (message: string): Promise<string> => {
+    if (!this.walletInfo) {
+      throw new Error("Wallet not connected");
+    }
+    return await window?.wallet?.bitcoinSignet?.signMessage(
+      message,
+      "bip322-simple",
+    );
+  };
+```
 
 ## AVS Reference Implementation
 
-The AVS deposits the yield as an ERC-20 token. The AVS is then able to compute the share of the yields to pay to each user and send it.  
+The AVS can use `gRPC` methods to retrieve and compute the share of the yields to pay to each user from the LSP. 
+
+The AVS then mints/deposits the rewwards and sends it to the destination user. 
 
 ```js
 contract YieldManager {
@@ -152,7 +166,16 @@ function callContractWithToken(
 
 ### IBC Chains 
 
-AVS which are natively IBC compatible simply need to emite the IBC packet and skip the EVM Gateway contract. They set the destination IBC channel as THORChain's and pass the final user L1 address. 
+AVS which are natively IBC compatible simply need to emit the IBC packet. 
+They set the destination IBC channel as THORChain's and pass the final user L1 address through the memo" 
+
+```go
+// send from AVS to TC
+    memo = "yield+:asset:userAddress"
+	msg = types.NewMsgTransfer(pathAVStoTC.EndpointA.ChannelConfig.PortID, pathAVStoTC.EndpointA.ChannelID, coinSentFromAVSToTC, suite.chainAVS.SenderAccount.GetAddress().String(), suite.chainTC.SenderAccount.GetAddress().String(), memo, timeoutHeight, 0)
+	res, err = suite.chainB.SendMsgs(msg)
+	suite.Require().NoError(err) // message committed
+```
 
 ## Yieldi WASM Contracts
 
@@ -172,11 +195,11 @@ Swap {
 ```
 
 ### Deposit to ETH Yield Account
-The callback would then stream to ETH/B TC to the user's ETH Yield Account: 
+The callback would then stream to ETH/BTC to the user's Yield Account: 
 
 ```md
 MsgDeposit{
-       yield+:eth~eth:ethAddress
+       yield+:{nativeAsset}:{userAddress}
 }
 ```
 
@@ -225,12 +248,11 @@ AVS's have two other problems that Yieldi solves:
 <img width="962" alt="image" src="https://github.com/user-attachments/assets/be1fa436-6bab-4ae4-bed5-d9097fa13492">
 
 Without an on-chain price of the AVS token, the user struggles to understand the cost of capital and risk in delegating their LRT/LST.
-
 For the AVS, illiquidity on launch will create price volatility and may struggle to transition to the fee regime effectively. If the AVS cannot transition to the fee regime they may suffer in security.  
 
 Thus AVS require the following features provided by Yieldi:
 
-1) Initial liquidity in the `TOR:AVS` token pool in Yieldi
+1) Initial liquidity in the `UST:AVS` token pool in Yieldi
 2) Ongoing liquidity incentives to ensure sufficient liquidity for users
 
 Over time, the operators with the most liquidity, stable price and economic activity on their chains can attract the highest quality delegated security.  
@@ -242,15 +264,17 @@ Over time, the operators with the most liquidity, stable price and economic acti
 A liquidity auction can be conducted by the AVS when setting up the channel. 
 
 1) Mint 5-10% of the supply into Yieldi as a CW-20 token
-2) Offer this in the new `TOR:AVS` token pool
+2) Offer this in the new `UST:AVS` token pool
 3) Over 7-30 days, anyone can deposit `TOR` to match the `AVS` token and infer the launch price of the asset.
-4) When the pool goes live, the AVS will own 50% of the pool, and Liquidity Auction participants will own the other 50%. 
+4) When the pool goes live, the AVS will own 50% of the pool, and Liquidity Auction participants will own the other 50%.
+
+> UST is a stablecoin on the THORChain protocol. 
 
 ## Liquidity Mining
 
 > AVS should incentivise sufficient liquidity to stablise price and ensure best execution
 
-The AVS should continually stream yield incentives to the `TOR:AVS` pool as it will be the primary liquidity venue for the AVS token. 
+The AVS should continually stream yield incentives to the `UST:AVS` pool as it will be the primary liquidity venue for the AVS token. 
 
 1) The AVS can stream token incentives through the IBC channel with destination the `TOR:AVS` pool.
 2) The incentives are added into the pool which are credited to the pool LPs.
