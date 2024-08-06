@@ -251,7 +251,8 @@ AVS's have two other problems that Yieldi solves:
 1) Price discovery of the AVS token
 2) On-chain liquidity of the AVS token
 
-<img width="774" alt="image" src="https://github.com/user-attachments/assets/b6fdc536-ff02-47fa-9a92-efdfac230bb9">
+<img width="773" alt="image" src="https://github.com/user-attachments/assets/4cb0eea6-b6ef-42ec-9d93-d01c15ef3175">
+
 
 
 Without an on-chain price of the AVS token, the user struggles to understand the cost of capital and risk in delegating their LRT/LST.
