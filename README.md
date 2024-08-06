@@ -23,9 +23,10 @@
     - [Yieldi WASM Contracts](#Yieldi-WASM-Contracts)
     - [THORChain Yield Accounts](#THORChain-Yield-Accounts)
 - [Economics](#Economics)
+    - [Problems](#Problems)
     - [One-time Liquidity Auction](#One-time-Liquidity-Auction)
     - [Liquidity Mining](#Liquidity-Mining)
-    - [BTC LSP Support](#BTC-LSP-Support)
+    - [Trust Assumptions](#Trust-Assumptions)
 - [Summary](#Summary)
 - [Technical Readiness](#Technical-Readiness)
 
@@ -284,14 +285,6 @@ The AVS should continually stream yield incentives to the `UST:AVS` pool as it w
 
 1) The AVS can stream token incentives through the IBC channel with destination the `TOR:AVS` pool.
 2) The incentives are added into the pool which are credited to the pool LPs.
-
-## BTC LSP Support
-
-Yield collection for BTC LSPs are also possible. 
-1) BTC locked in a script are parsed by the BTC LSP
-2) This can be delegated to a AVS which would be IBC compatible
-3) The AVS streams yield through IBC to Yieldi pools on THORChain where it is swapped to BTC
-4) The BTC is held in a yield account until it is ready to be streamed or claimed by the BTC user
 
 ## Trust Assumptions
 
