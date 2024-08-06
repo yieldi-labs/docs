@@ -1,7 +1,8 @@
 # Technical Architecture
 📜 Technical Architecture of Yieldi
 
-<img width="937" alt="image" src="https://github.com/user-attachments/assets/54eb9b43-5e16-491c-bf64-bbc1cbdb3b78">
+<img width="667" alt="image" src="https://github.com/user-attachments/assets/17121a21-166b-4603-8340-ad9c22e64e34">
+
 
 
 # Table of Contents
@@ -12,7 +13,7 @@
     - [How does it work?](#How-does-it-work?)
     - [What problem does it solve?](What-problem-does-it-solve?)
 - [Diagram](#diagram)
-    - [Eigenlayer: Restaking](#Eigenlayer-Restaking)
+    - [LSP: Staking-Restaking](#LSP-Staking-Restaking)
     - [AVS: Yield-streaming](#AVS-Yield-streaming)
     - [User: Yield-claiming](#User-Yield-claiming)
     - [User: Yield-claiming](#User-Yield-claiming)
@@ -60,21 +61,25 @@ Because the yield is lower risk, and in an asset delivered to the user, removing
 
 The following diagrams for each process provide a visual representation of the asset flow. 
 
-## Eigenlayer Restaking
+## LSP Staking-Restaking
 
-<img width="699" alt="image" src="https://github.com/user-attachments/assets/fd577da5-3862-4b40-8b5e-7f240aaf04fa">
+<img width="775" alt="image" src="https://github.com/user-attachments/assets/2a6123ce-326b-4950-9446-a1c01b27e284">
+
 
 ## AVS Yield-streaming
 
-<img width="698" alt="image" src="https://github.com/user-attachments/assets/098b95ac-d7cb-40d6-8a8b-561b978ed612">
+<img width="774" alt="image" src="https://github.com/user-attachments/assets/c9f33042-0d10-4c0f-96e4-9dd7f2862ba2">
+
 
 ## Yieldi Yield-collecting
 
-<img width="697" alt="image" src="https://github.com/user-attachments/assets/76f8348e-5670-437b-9232-43566dee2248">
+<img width="772" alt="image" src="https://github.com/user-attachments/assets/d1854e2d-b923-424e-8b13-df587f55bc6e">
+
 
 ## User Yield-claiming
 
-<img width="697" alt="image" src="https://github.com/user-attachments/assets/b36be643-dbda-4ef3-9e77-50d55a111c49">
+<img width="775" alt="image" src="https://github.com/user-attachments/assets/fd3783df-ded1-492e-989f-70ba6b5a2744">
+
 
 # Implementation
 
@@ -245,7 +250,8 @@ AVS's have two other problems that Yieldi solves:
 1) Price discovery of the AVS token
 2) On-chain liquidity of the AVS token
 
-<img width="962" alt="image" src="https://github.com/user-attachments/assets/be1fa436-6bab-4ae4-bed5-d9097fa13492">
+<img width="774" alt="image" src="https://github.com/user-attachments/assets/b6fdc536-ff02-47fa-9a92-efdfac230bb9">
+
 
 Without an on-chain price of the AVS token, the user struggles to understand the cost of capital and risk in delegating their LRT/LST.
 For the AVS, illiquidity on launch will create price volatility and may struggle to transition to the fee regime effectively. If the AVS cannot transition to the fee regime they may suffer in security.  
