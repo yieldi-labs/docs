@@ -3,8 +3,6 @@
 
 <img width="667" alt="image" src="https://github.com/user-attachments/assets/17121a21-166b-4603-8340-ad9c22e64e34">
 
-
-
 # Table of Contents
 
 - [Overview](#overview)
@@ -15,12 +13,12 @@
 - [Diagram](#diagram)
     - [LSP: Staking-Restaking](#LSP-Staking-Restaking)
     - [AVS: Yield-streaming](#AVS-Yield-streaming)
-    - [User: Yield-claiming](#User-Yield-claiming)
+    - [Yieldi: Yield-collecting](#Yieldi-Yield-collecting)
     - [User: Yield-claiming](#User-Yield-claiming)
 - [Implementation](#development)
     - [LSP Staking](#LSP-Staking)
-    - [AVS Reference Implementationn](#AVS-Reference-Implementation)
-    - [Yieldi WASM Contracts](#Yieldi-WASM-Contracts)
+    - [AVS Reference Implementation](#AVS-Reference-Implementation)
+    - [Yieldi Relayer](#Yieldi-Relayer)
     - [THORChain Yield Accounts](#THORChain-Yield-Accounts)
 - [Economics](#Economics)
     - [Problems](#Problems)
@@ -37,16 +35,16 @@ This document is a guide to understanding the design of Yieldi, with a clear and
 
 ## Terms:
 
-- `AVS` Active Validator Set for an app-chain
+- `AVS` Actively Validated Set (app-chain)
 - `IBC` Inter-Blockchain Communication protocol
 - `LST` Liquid Staking Token
 - `LSP` Liquid Staking Protocol
 
 ## What is Yieldi?
 
-Yieldi offers a gas-efficient yield-streaming solution for the [Eigenlayer](https://eigenlayer.xyz/) and [Babylon](https://babylonlabs.io)) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH/BTC liquidity. Users can re-stake ETH with Eigenlayer, stake BTC with Babylon and delegate their security to an AVS. The AVS can then stream yield back to the staker natively using Yieldi. 
+Yieldi offers a gas-efficient yield-streaming solution for the [Eigenlayer](https://eigenlayer.xyz/) and [Babylon](https://babylonlabs.io) ecosystem, and it will initially be deployed on [Thorchain](https://thorchain.org/) which has native ETH/BTC liquidity. Users can delegate their LST/LRT security to an AVS and the AVS can then stream yield back to the staker natively using Yieldi. 
 
-Yieldi also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate LST to AVS operators if they are paid real-yield in native assets (ETH). It provides the lowest cost of security, because it offers the highest stability and least friction to the staker. Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
+Yieldi also solves for price-discovery and liquidity of AVS tokens, and will increase the propensity of users to delegate to AVS operators if they are paid real-yield in native assets (ETH/BTC). It provides the lowest cost of security, because it offers the highest stability and least friction to the staker. Lastly it ensures that the full cycle of yield collection from AVS is conducted with minimal trust assumptions and third-party dependencies. 
 
 ## How does it work?
 
@@ -128,7 +126,7 @@ Babylon users will lock to a [BIP322 script](https://github.com/bitcoin/bips/blo
 
 The AVS can use `gRPC` methods to retrieve and compute the share of the yields to pay to each user from the LSP. 
 
-The AVS then mints/deposits the rewwards and sends it to the destination user. 
+The AVS then mints/deposits the rewards and sends it to the destination user. 
 
 ```js
 contract YieldManager {
@@ -142,12 +140,10 @@ contract YieldManager {
 }
 ```
 
-### EVM to IBC
+### Yieldi Relayer
 
 The AVS must have a deployed [gateway contract](https://docs.axelar.dev/dev/cosmos-gmp) which can lock tokens and emit an IBC-compatible message. 
-The IBC relayer mints IBC-tokens and then forwards to THORChain via an IBC channel. 
-
-Only the Staker's L1 address and the yield amount is sent (in yield tokens). 
+The Yieldi relayer mints IBC-tokens and then processes. Only the Staker's L1 address and the yield amount is sent (in yield tokens). 
 
 ```js
 bytes memory argValue = abi.encode(recipients); // A standard EVM payload
@@ -170,10 +166,7 @@ function callContractWithToken(
 ) external;
 ```
 
-### IBC Chains 
-
-AVS which are natively IBC compatible simply need to emit the IBC packet. 
-They set the destination IBC channel as THORChain's and pass the final user L1 address through the memo" 
+AVS which are natively IBC compatible simply need to emit the IBC packet to Yieldi. 
 
 ```go
 // send from AVS to TC
@@ -186,7 +179,7 @@ They set the destination IBC channel as THORChain's and pass the final user L1 a
 ## Yieldi WASM Contracts
 
 ### IBC Swap to TOR
-Yieldi receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to native ETH/BTC. 
+Yieldi receives the IBC payload and executes a [Swap](https://github.com/Team-Kujira/kujira-rs/blob/master/packages/kujira-fin/src/execute.rs) to native ETH/BTC via THORChain. 
 
 ```rs
 ExecuteMsg
@@ -199,7 +192,6 @@ Swap {
         callback: Option<CallbackData>,
     }
 ```
-
 ### Deposit to ETH Yield Account
 The callback would then stream to ETH/BTC to the user's Yield Account: 
 
@@ -224,7 +216,7 @@ last_withdraw_height: 17111060
 }
 ```
 
-The user can `CLAIM` their yield at anytime by interating with [THORChain's Router](https://gitlab.com/thorchain/thornode/-/blob/develop/chain/ethereum/contracts/THORChain_Router.sol)
+The user can `CLAIM` their yield at anytime by interacting with [THORChain's Router](https://gitlab.com/thorchain/thornode/-/blob/develop/chain/ethereum/contracts/THORChain_Router.sol)
 ```md
 function depositWithExpiry(address payable vault, address asset, uint amount, string memory memo, uint expiration) public
 
@@ -252,8 +244,6 @@ AVS's have two other problems that Yieldi solves:
 2) On-chain liquidity of the AVS token
 
 <img width="773" alt="image" src="https://github.com/user-attachments/assets/4cb0eea6-b6ef-42ec-9d93-d01c15ef3175">
-
-
 
 Without an on-chain price of the AVS token, the user struggles to understand the cost of capital and risk in delegating their LRT/LST.
 For the AVS, illiquidity on launch will create price volatility and may struggle to transition to the fee regime effectively. If the AVS cannot transition to the fee regime they may suffer in security.  
