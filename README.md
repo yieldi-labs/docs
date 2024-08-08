@@ -250,7 +250,7 @@ For the AVS, illiquidity on launch will create price volatility and may struggle
 
 Thus AVS require the following features provided by Yieldi:
 
-1) Initial liquidity in the `UST:AVS` token pool in Yieldi
+1) Initial liquidity in the `TOR:AVS` token pool in Yieldi
 2) Ongoing liquidity incentives to ensure sufficient liquidity for users
 
 Over time, the operators with the most liquidity, stable price and economic activity on their chains can attract the highest quality delegated security.  
@@ -262,17 +262,17 @@ Over time, the operators with the most liquidity, stable price and economic acti
 A liquidity auction can be conducted by the AVS when setting up the channel. 
 
 1) Mint 5-10% of the supply into Yieldi as a CW-20 token
-2) Offer this in the new `UST:AVS` token pool
+2) Offer this in the new `TOR:AVS` token pool
 3) Over 7-30 days, anyone can deposit `TOR` to match the `AVS` token and infer the launch price of the asset.
 4) When the pool goes live, the AVS will own 50% of the pool, and Liquidity Auction participants will own the other 50%.
 
-> UST is a stablecoin on the THORChain protocol. 
+> TOR is a stablecoin on the THORChain protocol. 
 
 ## Liquidity Mining
 
 > AVS should incentivise sufficient liquidity to stablise price and ensure best execution
 
-The AVS should continually stream yield incentives to the `UST:AVS` pool as it will be the primary liquidity venue for the AVS token. 
+The AVS should continually stream yield incentives to the `TOR:AVS` pool as it will be the primary liquidity venue for the AVS token. 
 
 1) The AVS can stream token incentives through the IBC channel with destination the `TOR:AVS` pool.
 2) The incentives are added into the pool which are credited to the pool LPs.
