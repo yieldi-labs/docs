@@ -44,6 +44,14 @@ Liquidity
 
 <img width="715" alt="image" src="https://github.com/user-attachments/assets/2e41b3fb-7e2d-47e6-92ed-e20bd03d00b0">
 
+# Yieldi As an LSP itself
+
+Yieldi can manage the staked ETH/BTC itself `yETH` `yBTC`
+
+* Fork Eigenlayer for `yETH`
+* Fork Babylon for `yBTC`
+
+Main problem to solve is double-sign slashing, but Yieldi Operators can double up as the slashing committee and receive income when slashing. 
 
 # Yieldi As an AVS itself
 
