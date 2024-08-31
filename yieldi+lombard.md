@@ -34,3 +34,27 @@ What is the yield-bearing staked BTC derivative? This is a $30bn-$50bn opportuni
 
 <img width="674" alt="image" src="https://github.com/user-attachments/assets/af7b9d65-711d-4152-8469-490afe731b73">
 
+
+
+## THORChain Yield Streaming
+
+THORChain streams any token into a preferred asset set by the affiliate. 
+
+Here is for Trust Wallet, which streams affiliate fees to USDC on a gas-efficient interval:
+https://etherscan.io/address/0xe020C8934B23E5bCcA1E7EEcdb6f39674029Fe47#tokentxns
+<img width="1410" alt="image" src="https://github.com/user-attachments/assets/60d47000-7605-4de1-9d06-82a2be2ed373">
+
+This would be streaming real BTC to Lombard BTC Vaults. 
+
+
+## THORChain Affiliates
+
+THORChain can stream affiliate fees to any affiliate. 
+Yieldi can take off 10-30BPS and stream income to Lombard treasuy. Lombard would earn off all yield streamed. 
+
+
+
+
+
+
+
