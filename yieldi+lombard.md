@@ -1,21 +1,21 @@
 # Context
 
 ## STETH As Case Study
-ETH: [$300bn](https://www.coingecko.com/en/coins/ethereum)
-WETH: [$7bn](https://www.coingecko.com/en/coins/weth)
-STETH: [$25bn](https://www.coingecko.com/en/coins/lido-staked-ether)
+* ETH: [$300bn](https://www.coingecko.com/en/coins/ethereum)
+* WETH: [$7bn](https://www.coingecko.com/en/coins/weth)
+* STETH: [$25bn](https://www.coingecko.com/en/coins/lido-staked-ether)
 
 STETH is the yield-bearing staked ETH derivative with counter-party and slashing risk, yet is 4 times larger than wrapped ETH, the non-yield bearing 0-risk Wrapped ETH. 
 
 [ETH Economics](https://defillama.com/chain/Ethereum)
-ETH DeFi TVL: ~$20bn 
-ETH Daily Fees: $1m
-STETH Yields: ~4% APR
+* ETH DeFi TVL: ~$20bn 
+* ETH Daily Fees: $1m
+* STETH Yields: ~4% APR
 
 ## BTC As Opportunity
-BTC: [1.1tn](https://www.coingecko.com/en/coins/bitcoin)
-WBTC: [9bn](https://www.coingecko.com/en/coins/wrapped-bitcoin)
-lBTC:???
+* BTC: [1.1tn](https://www.coingecko.com/en/coins/bitcoin)
+* WBTC: [9bn](https://www.coingecko.com/en/coins/wrapped-bitcoin)
+* LBTC:???
 
 What is the yield-bearing staked BTC derivative? This is a $30bn-$50bn opportunity today. 
 
