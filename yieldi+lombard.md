@@ -20,7 +20,7 @@ STETH is the yield-bearing staked ETH derivative with counter-party and slashing
 What is the yield-bearing staked BTC derivative? This is a $30bn-$50bn opportunity today. 
 
 # Premises
-1) App-chains, L2s, AVS's to onboard $20bn+ in TVL to sustain Fees/Rewards to pay yield to $20bn+ in lBTC
+1) App-chains, L2s, AVS's to onboard $20bn+ in TVL to sustain Fees/Rewards to pay yield to $20bn+ in LBTC
 2) Target Yield 2% requires $1m/day in fees/rewards
 3) Fees/rewards streamed back to lBTC to rebase
 
