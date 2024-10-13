@@ -9,8 +9,8 @@ Incentive pendulum keeps 1:1 security on BOND:POOL
 * Yield owners should withdraw (reduced bridged assets)
 * Nodes should bond more (for yield)
 
-Usecases
-* A user with BTC wants to deposit in a wrappedBTC yield vault on some other chain, and be streamed back yield.
+User Stories
+* A user with BTC wants to deposit in a wrappedBTC yield vault on some other chain, and be streamed back BTC yield.
 * A user with ETH wants to stake, and delegate security to an AVS to earn yield, streamed back in USDC
 * A user with an ETH address wants to have a TON memecoin balance
 
@@ -34,6 +34,26 @@ BTC Example
 * Delegate to AVS, earn yield
 * Yield sold to BTC
 * BTC streamed back to user
+
+# Liquidity
+Liquidity is provided by external assets matched to an internal, arbitrary unit of account - `Y`. 
+`Y` is minted only to start the initial locked liquidity for new chains and pools. 
+New liquidity providers have to stream-add and stream-remove at a small rate to stop slippage - 3-5BPS.  
+
+# Swaps
+All swaps are streaming - streamed from one asset pool to another via `Y`. They target a low slippage - 5-10BPS. 
+
+# Remote Balances
+Any EOA can hold a yield position in any aggregated vault, but the yield position is managed by Yieldi MPC. 
+EOAs submit signed messages from their address to manage remote balances and positions - not L1 transactions. 
+
+# Chains
+Chains are added rapidly using just RPC methods. MPC EOAs manage each vault. 
+
+# Memoless ERC20 deposits. 
+ERC20's can be deposited to the system from any address. The user sends a signed message instructing the state machine how to manage it (before or after the deposit). 
+
+
 
 
 
